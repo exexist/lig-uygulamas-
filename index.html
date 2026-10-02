@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIFA 4'LÜ LİG - Sezon Yönetim Merkezi</title>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fa-solid fa-trophy highlight-gold"></i>
+                    <div class="logo-text">
+                        <h1>FIFA 4'LÜ LİG</h1>
+                        <span>SEZON YÖNETİM MERKEZİ</span>
+                    </div>
+                </div>
+                <button class="close-sidebar-btn" id="closeSidebarBtn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <button class="nav-btn active" data-target="dashboard"><i class="fa-solid fa-chart-pie"></i> <span>Dashboard</span></button>
+                <button class="nav-btn" data-target="teams"><i class="fa-solid fa-users"></i> <span>Takımlar</span></button>
+                <button class="nav-btn" data-target="transfers"><i class="fa-solid fa-right-left"></i> <span>Transfer Merkezi</span></button>
+                <button class="nav-btn" data-target="market"><i class="fa-solid fa-store"></i> <span>Oyuncu Pazarı</span></button>
+                <button class="nav-btn" data-target="standings"><i class="fa-solid fa-list-ol"></i> <span>Puan Durumu</span></button>
+                <button class="nav-btn" data-target="matches"><i class="fa-solid fa-futbol"></i> <span>Maçlar</span></button>
+                <button class="nav-btn" data-target="finance"><i class="fa-solid fa-wallet"></i> <span>Finans</span></button>
+                <button class="nav-btn" data-target="history"><i class="fa-solid fa-clock-rotate-left"></i> <span>Lig Geçmişi</span></button>
+                <button class="nav-btn" data-target="settings"><i class="fa-solid fa-gear"></i> <span>Ayarlar & Admin</span></button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="season-badge">
+                    <i class="fa-solid fa-calendar-days"></i> <span id="currentSeasonText">Sezon 2 (Aktif)</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
+            <!-- TOPBAR -->
+            <header class="topbar">
+                <button class="menu-toggle-btn" id="menuToggleBtn"><i class="fa-solid fa-bars"></i></button>
+                <div class="topbar-title">
+                    <h2 id="pageTitle">Dashboard</h2>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn btn-gold btn-sm" onclick="openAddMatchModal()"><i class="fa-solid fa-plus"></i> Maç Ekle</button>
+                    <button class="btn btn-outline btn-sm" onclick="openQuickTransferModal()"><i class="fa-solid fa-bolt"></i> Hızlı Transfer</button>
+                </div>
+            </header>
+
+            <div class="content-body">
+
+                <!-- 1. DASHBOARD VIEW -->
+                <section id="view-dashboard" class="view-section active">
+                    <!-- Top Stats Cards -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon gold"><i class="fa-solid fa-trophy"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-label">Aktif Sezon</span>
+                                <h3 id="statSeason">2</h3>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon blue"><i class="fa-solid fa-shield-halved"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-label">Toplam Takım</span>
+                                <h3 id="statTeams">4</h3>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon green"><i class="fa-solid fa-user-group"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-label">Toplam Oyuncu</span>
+                                <h3 id="statPlayers">0</h3>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon purple"><i class="fa-solid fa-arrows-rotate"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-label">Toplam Transfer</span>
+                                <h3 id="statTransfers">0</h3>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon gold"><i class="fa-solid fa-crown"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-label">Son Şampiyon</span>
+                                <h3 id="statChampion">Yiğit</h3>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon green"><i class="fa-solid fa-money-bill-wave"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-label">Toplam Para</span>
+                                <h3 id="statTotalMoney">0M €</h3>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon red"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-label">Toplam Borç</span>
+                                <h3 id="statTotalDebt">0M €</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reigning Champion Highlight Banner -->
+                    <div class="champion-banner" id="championBanner">
+                        <div class="champ-content">
+                            <div class="champ-badge">SON ŞAMPİYON</div>
+                            <h2 id="champName">YİĞİT</h2>
+                            <p>Sezon 1 Şampiyonu - Kupanın Sahibi</p>
+                        </div>
+                        <div class="champ-trophy">
+                            <i class="fa-solid fa-trophy"></i>
+                        </div>
+                    </div>
+
+                    <!-- Teams Overview Cards -->
+                    <h3 class="section-heading"><i class="fa-solid fa-users"></i> Takım Durumları</h3>
+                    <div class="team-cards-grid" id="dashboardTeamCards">
+                        <!-- JS populated -->
+                    </div>
+
+                    <!-- Charts & Feeds Grid -->
+                    <div class="dashboard-grid mt-20">
+                        <div class="grid-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-chart-column"></i> Bütçe ve Kadro Değerleri</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="chartBudgetsHeight" height="220"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="grid-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-fire"></i> Lig Rekorları & Önemli İstatistikler</h3>
+                            </div>
+                            <div class="card-body" id="leagueRecordsContainer">
+                                <!-- JS populated -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Feeds -->
+                    <div class="dashboard-grid mt-20">
+                        <div class="grid-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-newspaper"></i> Son Lig Haberleri</h3>
+                            </div>
+                            <div class="card-body news-feed" id="dashboardNewsFeed">
+                                <!-- JS populated -->
+                            </div>
+                        </div>
+
+                        <div class="grid-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-right-left"></i> Son Transferler</h3>
+                            </div>
+                            <div class="card-body" id="dashboardRecentTransfers">
+                                <!-- JS populated -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. TEAMS VIEW -->
+                <section id="view-teams" class="view-section">
+                    <div class="teams-container" id="teamsListContainer">
+                        <!-- JS populated -->
+                    </div>
+                </section>
+
+                <!-- 3. TRANSFERS VIEW -->
+                <section id="view-transfers" class="view-section">
+                    <div class="transfer-modes-grid">
+                        <div class="mode-card" onclick="openTransferModal('normal')">
+                            <i class="fa-solid fa-handshake"></i>
+                            <h3>Normal Transfer</h3>
+                            <p>Piyasa değerinin altında teklif verilemez.</p>
+                            <button class="btn btn-gold btn-sm mt-10">İşlem Yap</button>
+                        </div>
+                        <div class="mode-card" onclick="openTransferModal('auction')">
+                            <i class="fa-solid fa-gavel"></i>
+                            <h3>Açık Artırma</h3>
+                            <p>Oyuncuyu satışa çıkar, en yüksek teklifi veren alsın.</p>
+                            <button class="btn btn-gold btn-sm mt-10">Açık Artırma Başlat</button>
+                        </div>
+                        <div class="mode-card" onclick="openTransferModal('panic')">
+                            <i class="fa-solid fa-bolt-lightning"></i>
+                            <h3>Panik Transfer</h3>
+                            <p>Değerin %125'i ödenir. Sezonda 1 hak.</p>
+                            <button class="btn btn-gold btn-sm mt-10">Panik Kullan</button>
+                        </div>
+                        <div class="mode-card" onclick="openTransferModal('swap')">
+                            <i class="fa-solid fa-repeat"></i>
+                            <h3>Takas Transferi</h3>
+                            <p>Oyuncu + Para karşılığı takas gerçekleştirin.</p>
+                            <button class="btn btn-gold btn-sm mt-10">Takas Yap</button>
+                        </div>
+                    </div>
+
+                    <div class="card mt-20">
+                        <div class="card-header flex-between">
+                            <h3><i class="fa-solid fa-receipt"></i> Transfer Geçmişi</h3>
+                            <div class="filter-group">
+                                <select id="transferFilterSeason" onchange="renderTransfersPage()">
+                                    <option value="all">Tüm Sezonlar</option>
+                                    <option value="2">Sezon 2</option>
+                                    <option value="1">Sezon 1</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="card-body table-responsive">
+                            <table class="data-table">
+                               <thead>
+                                   <tr>
+                                       <th>Tarih / Sezon</th>
+                                       <th>Oyuncu</th>
+                                       <th>Satıcı</th>
+                                       <th>Alıcı</th>
+                                       <th>Transfer Tipi</th>
+                                       <th>Bonservis</th>
+                                       <th>İşlem</th>
+                                   </tr>
+                               </thead>
+                               <tbody id="transferHistoryTable">
+                                   <!-- JS Populated -->
+                               </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. PLAYERS MARKET VIEW -->
+                <section id="view-market" class="view-section">
+                    <div class="card mb-20">
+                        <div class="card-header flex-between">
+                            <h3><i class="fa-solid fa-filter"></i> Oyuncu Filtreleme & Arama</h3>
+                            <button class="btn btn-gold btn-sm" onclick="openAddPlayerModal()"><i class="fa-solid fa-user-plus"></i> Yeni Oyuncu Ekle</button>
+                        </div>
+                        <div class="card-body">
+                            <div class="filter-grid">
+                                <input type="text" id="marketSearchName" placeholder="Oyuncu Adı Ara..." oninput="renderMarketPage()">
+                                <select id="marketFilterTeam" onchange="renderMarketPage()">
+                                    <option value="all">Tüm Takımlar</option>
+                                    <option value="1">Emir</option>
+                                    <option value="2">Demir</option>
+                                    <option value="3">Tuğra</option>
+                                    <option value="4">Yiğit</option>
+                                    <option value="free">Serbest Oyuncular</option>
+                                </select>
+                                <input type="number" id="marketMinOvr" placeholder="Min OVR" oninput="renderMarketPage()">
+                                <input type="number" id="marketMaxOvr" placeholder="Maks OVR" oninput="renderMarketPage()">
+                                <input type="number" id="marketMinValue" placeholder="Min Değer (M€)" oninput="renderMarketPage()">
+                                <input type="number" id="marketMaxValue" placeholder="Maks Değer (M€)" oninput="renderMarketPage()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Oyuncu</th>
+                                        <th>OVR</th>
+                                        <th>Takımı</th>
+                                        <th>Piyasa Değeri</th>
+                                        <th>Gol</th>
+                                        <th>Asist</th>
+                                        <th>Clean Sheet</th>
+                                        <th>Aksiyon</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="marketPlayersTable">
+                                    <!-- JS populated -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. STANDINGS VIEW -->
+                <section id="view-standings" class="view-section">
+                    <div class="card">
+                        <div class="card-header flex-between">
+                            <h3><i class="fa-solid fa-list-ol"></i> Sezon 2 Puan Durumu</h3>
+                            <button class="btn btn-gold btn-sm" onclick="openAddMatchModal()"><i class="fa-solid fa-plus"></i> Maç Sonucu Gir</button>
+                        </div>
+                        <div class="card-body table-responsive">
+                            <table class="data-table standings-table">
+                                <thead>
+                                    <tr>
+                                        <th>Sıra</th>
+                                        <th>Takım</th>
+                                        <th>O</th>
+                                        <th>G</th>
+                                        <th>B</th>
+                                        <th>M</th>
+                                        <th>AG</th>
+                                        <th>YG</th>
+                                        <th>AV</th>
+                                        <th>Puan</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="standingsTableBody">
+                                    <!-- JS populated -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 6. MATCHES VIEW -->
+                <section id="view-matches" class="view-section">
+                    <div class="card">
+                        <div class="card-header flex-between">
+                            <h3><i class="fa-solid fa-futbol"></i> Fikstür ve Maç Sonuçları</h3>
+                            <button class="btn btn-gold btn-sm" onclick="openAddMatchModal()"><i class="fa-solid fa-plus"></i> Yeni Maç Ekle</button>
+                        </div>
+                        <div class="card-body table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Tarih</th>
+                                        <th>Sezon</th>
+                                        <th>Ev Sahibi</th>
+                                        <th>Skor</th>
+                                        <th>Deplasman</th>
+                                        <th>Gelir Durumu</th>
+                                        <th>İşlem</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="matchesTableBody">
+                                    <!-- JS populated -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 7. FINANCE VIEW -->
+                <section id="view-finance" class="view-section">
+                    <div class="teams-finance-grid" id="financeTeamsGrid">
+                        <!-- JS populated -->
+                    </div>
+
+                    <div class="card mt-20">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-clock-rotate-left"></i> Finans Hareketleri Geçmişi</h3>
+                        </div>
+                        <div class="card-body table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Tarih</th>
+                                        <th>Takım</th>
+                                        <th>İşlem</th>
+                                        <th>Tutar</th>
+                                        <th>Açıklama / Sebep</th>
+                                        <th>Aksiyon</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="financeLogsTableBody">
+                                    <!-- JS populated -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 8. HISTORY VIEW -->
+                <section id="view-history" class="view-section">
+                    <div class="card mb-20">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-trophy highlight-gold"></i> Lig Şampiyonları</h3>
+                        </div>
+                        <div class="card-body" id="championsHistoryList">
+                            <!-- JS Populated -->
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-box-archive"></i> Tamamlanan Sezonlar İstatistikleri</h3>
+                        </div>
+                        <div class="card-body" id="seasonsHistoryContainer">
+                            <!-- JS Populated -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 9. SETTINGS & ADMIN VIEW -->
+                <section id="view-settings" class="view-section">
+                    <div class="dashboard-grid">
+                        <!-- League Rules Settings -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-sliders"></i> Lig & Ödül Ayarları</h3>
+                            </div>
+                            <div class="card-body">
+                                <form id="settingsForm" onsubmit="saveSettings(event)">
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label>Galibiyet Geliri (M€)</label>
+                                            <input type="number" id="settingWinReward" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Beraberlik Geliri (M€)</label>
+                                            <input type="number" id="settingDrawReward" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>1. Şampiyonluk Ödülü (M€)</label>
+                                            <input type="number" id="settingChamp1" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>2. Şampiyonluk Ödülü (M€)</label>
+                                            <input type="number" id="settingChamp2" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>3. Şampiyonluk Ödülü (M€)</label>
+                                            <input type="number" id="settingChamp3" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>4. Sıra Ödülü (M€)</label>
+                                            <input type="number" id="settingChamp4" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Gol Kralı Ödülü (M€)</label>
+                                            <input type="number" id="settingTopScorer" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Asist Kralı Ödülü (M€)</label>
+                                            <input type="number" id="settingTopAssist" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>En Az Gol Yiyen Ödülü (M€)</label>
+                                            <input type="number" id="settingBestDef" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Maksimum Borç Limiti (M€)</label>
+                                            <input type="number" id="settingMaxDebt" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Borç Faizi oranı (%)</label>
+                                            <input type="number" id="settingDebtInterest" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Panik Transfer Oranı (%)</label>
+                                            <input type="number" id="settingPanicRate" required>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-gold mt-15"><i class="fa-solid fa-floppy-disk"></i> Ayarları Kaydet</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Data Backup & Reset -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-database"></i> Veri Yönetimi & Yedekleme</h3>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-15">Tüm lig verilerinizi JSON formatında dışa aktarabilir veya daha önce aldığınız yedeği geri yükleyebilirsiniz.</p>
+                                <div class="btn-group">
+                                    <button class="btn btn-outline" onclick="exportDataJSON()"><i class="fa-solid fa-download"></i> Verileri Dışa Aktar (JSON)</button>
+                                    <label class="btn btn-outline">
+                                        <i class="fa-solid fa-upload"></i> Verileri İçe Aktar
+                                        <input type="file" id="importJsonInput" accept=".json" onchange="importDataJSON(event)" style="display: none;">
+                                    </label>
+                                </div>
+                                <hr class="divider">
+                                <h4 class="text-red mb-10"><i class="fa-solid fa-triangle-exclamation"></i> Sezon Yönetimi</h4>
+                                <button class="btn btn-red mb-10" onclick="finishSeason()"><i class="fa-solid fa-flag-checkered"></i> Mevcut Sezonu Bitir & Ödülleri Dağıt</button>
+                                <button class="btn btn-red-outline" onclick="resetAllData()"><i class="fa-solid fa-trash"></i> Tüm Sistemi Fabrika Ayarlarına Sıfırla</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ADMIN ACTIONS -->
+                    <div class="card mt-20">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-user-shield"></i> Admin Manuel Müdahale Merkezi</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="admin-actions-grid">
+                                <button class="btn btn-outline" onclick="openAdminBudgetModal()"><i class="fa-solid fa-coins"></i> Bütçe Ekle/Çıkar</button>
+                                <button class="btn btn-outline" onclick="openAdminDebtModal()"><i class="fa-solid fa-hand-holding-dollar"></i> Borç Düzenle</button>
+                                <button class="btn btn-outline" onclick="openAdminStatsModal()"><i class="fa-solid fa-chart-line"></i> Oyuncu İst. Düzenle</button>
+                                <button class="btn btn-outline" onclick="openAdminValueModal()"><i class="fa-solid fa-tags"></i> Oyuncu Değeri Değiştir</button>
+                                <button class="btn btn-outline" onclick="openAdminPointsModal()"><i class="fa-solid fa-calculator"></i> Takım Puan/Gol Düzenle</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODALS -->
+
+    <!-- TEAM SQUAD MODAL -->
+    <div class="modal-overlay" id="squadModal">
+        <div class="modal-card modal-lg">
+            <div class="modal-header">
+                <h3 id="squadModalTitle">Takım Kadrosu</h3>
+                <button class="close-modal" onclick="closeModal('squadModal')">&times;</button>
+            </div>
+            <div class="modal-body table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Oyuncu</th>
+                            <th>OVR</th>
+                            <th>Piyasa Değeri</th>
+                            <th>Gol</th>
+                            <th>Asist</th>
+                            <th>Clean Sheet</th>
+                        </tr>
+                    </thead>
+                    <tbody id="squadModalTableBody">
+                        <!-- JS populated -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MATCH MODAL -->
+    <div class="modal-overlay" id="matchModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Yeni Maç Sonucu Gir</h3>
+                <button class="close-modal" onclick="closeModal('matchModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addMatchForm" onsubmit="handleAddMatch(event)">
+                    <div class="form-group">
+                        <label>Ev Sahibi Takım</label>
+                        <select id="matchHomeTeam" required onchange="validateMatchTeams()"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Deplasman Takımı</label>
+                        <select id="matchAwayTeam" required onchange="validateMatchTeams()"></select>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Ev Sahibi Gol</label>
+                            <input type="number" id="matchHomeGoals" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Deplasman Gol</label>
+                            <input type="number" id="matchAwayGoals" min="0" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-gold full-width mt-15">Maç Kaydet & Puanları İşle</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- TRANSFER MODAL -->
+    <div class="modal-overlay" id="transferModal">
+        <div class="modal-card modal-lg">
+            <div class="modal-header">
+                <h3 id="transferModalTitle">Transfer İşlemi</h3>
+                <button class="close-modal" onclick="closeModal('transferModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Dynamic Content Loaded via JS -->
+                <div id="transferModalContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD PLAYER MODAL -->
+    <div class="modal-overlay" id="addPlayerModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Yeni Oyuncu Ekle</h3>
+                <button class="close-modal" onclick="closeModal('addPlayerModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="handleCreatePlayer(event)">
+                    <div class="form-group">
+                        <label>Oyuncu Adı</label>
+                        <input type="text" id="newPlayerName" required>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Overall (OVR)</label>
+                            <input type="number" id="newPlayerOvr" min="50" max="99" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Piyasa Değeri (M€)</label>
+                            <input type="number" id="newPlayerValue" min="1" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Takımı</label>
+                        <select id="newPlayerTeam">
+                            <option value="free">Serbest Oyuncu</option>
+                            <option value="1">Emir</option>
+                            <option value="2">Demir</option>
+                            <option value="3">Tuğra</option>
+                            <option value="4">Yiğit</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-gold full-width mt-15">Oyuncuyu Kaydet</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN BUDGET MODAL -->
+    <div class="modal-overlay" id="adminBudgetModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Kasa / Bütçe Ekle - Çıkar</h3>
+                <button class="close-modal" onclick="closeModal('adminBudgetModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="handleAdminBudget(event)">
+                    <div class="form-group">
+                        <label>Takım Seçin</label>
+                        <select id="adminBudgetTeam" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Miktar (M€ - Ekleme için pozitif, çıkarma için negatif)</label>
+                        <input type="number" id="adminBudgetAmount" placeholder="Örn: 15 veya -10" required>
+                    </div>
+                    <div class="form-group">
+                        <label>İşlem Sebebi</label>
+                        <input type="text" id="adminBudgetReason" placeholder="Sponsor, Ceza vb." required>
+                    </div>
+                    <button type="submit" class="btn btn-gold full-width mt-15">İşlemi Uygula</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN DEBT MODAL -->
+    <div class="modal-overlay" id="adminDebtModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Borç Alma / Ödeme İşlemi</h3>
+                <button class="close-modal" onclick="closeModal('adminDebtModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="handleAdminDebt(event)">
+                    <div class="form-group">
+                        <label>Takım Seçin</label>
+                        <select id="adminDebtTeam" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>İşlem Türü</label>
+                        <select id="adminDebtType">
+                            <option value="take">Borç Al (Maks 30M €)</option>
+                            <option value="pay">Borç Öde</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Miktar (M€)</label>
+                        <input type="number" id="adminDebtAmount" min="1" required>
+                    </div>
+                    <button type="submit" class="btn btn-gold full-width mt-15">Borç İşlemini Onayla</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN PLAYER STATS MODAL -->
+    <div class="modal-overlay" id="adminStatsModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Oyuncu İstatistiklerini Düzenle</h3>
+                <button class="close-modal" onclick="closeModal('adminStatsModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="handleAdminStats(event)">
+                    <div class="form-group">
+                        <label>Oyuncu Seçin</label>
+                        <select id="adminStatsPlayer" required onchange="loadPlayerStatsToForm()"></select>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Gol</label>
+                            <input type="number" id="adminStatsGoals" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Asist</label>
+                            <input type="number" id="adminStatsAssists" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Clean Sheet</label>
+                            <input type="number" id="adminStatsCS" min="0" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-gold full-width mt-15">İstatistikleri Güncelle</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN VALUE MODAL -->
+    <div class="modal-overlay" id="adminValueModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Oyuncu Piyasa Değeri Değiştir</h3>
+                <button class="close-modal" onclick="closeModal('adminValueModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="handleAdminValue(event)">
+                    <div class="form-group">
+                        <label>Oyuncu Seçin</label>
+                        <select id="adminValuePlayer" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Yeni Piyasa Değeri (M€)</label>
+                        <input type="number" id="adminValueAmount" min="1" required>
+                    </div>
+                    <button type="submit" class="btn btn-gold full-width mt-15">Değeri Güncelle</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN POINTS MODAL -->
+    <div class="modal-overlay" id="adminPointsModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Takım Puan / Gol Manuel Düzenle</h3>
+                <button class="close-modal" onclick="closeModal('adminPointsModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="handleAdminPoints(event)">
+                    <div class="form-group">
+                        <label>Takım</label>
+                        <select id="adminPointsTeam" required onchange="loadTeamPointsToForm()"></select>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Galibiyet (G)</label>
+                            <input type="number" id="adminWins" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Beraberlik (B)</label>
+                            <input type="number" id="adminDraws" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Mağlubiyet (M)</label>
+                            <input type="number" id="adminLosses" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Atılan Gol (AG)</label>
+                            <input type="number" id="adminGA" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Yenen Gol (YG)</label>
+                            <input type="number" id="adminGS" min="0" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-gold full-width mt-15">Tabloyu Güncelle</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATIONS -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
